@@ -25,42 +25,6 @@
 #include "browserstub.h"
 #include "playerstub.h"
 
-template<typename StubImpl, typename Provider>
-bool registerService (std::shared_ptr<CommonAPI::Runtime> runtime,
-                     Provider *provider,
-                      std::string address,
-                      std::string friendly,
-                      MmError *e) {
-        auto factory = runtime->createFactory();
-        if (!factory) {
-            std::cerr << "Error: Unable to create factory!\n";
-            return false;
-        }
-
-        auto servicePublisher = runtime->getServicePublisher();
-        if (!servicePublisher) {
-            std::cerr << "Error: Unable to load service publisher!\n";
-            return false;
-        }
-
-        if (!e) {
-            auto stub = std::make_shared<StubImpl>(provider);
-
-            const bool success= servicePublisher->registerService(stub,
-                                                                   address,
-                                                                   factory);
-            if (!success) {
-                std::cerr << "Error: Unable to register " << friendly << " service!\n";
-            }
-        } else {
-            std::cout << "Error connecting to " << friendly << ": " << e->message << std::endl;
-            return false;
-        }
-
-        return true;
-}
-
-
 int main (int argc, char *argv[]) {
     guint watcher_id;
     GMainLoop *loop;
@@ -68,41 +32,32 @@ int main (int argc, char *argv[]) {
     BrowserProvider browser;
     PlayerProvider player;
 
+    static std::shared_ptr<IndexerStubImpl> indexerService = std::make_shared<IndexerStubImpl>(&lms);
+    static std::shared_ptr<BrowserStubImpl> browserService = std::make_shared<BrowserStubImpl>(&browser);
+    static std::shared_ptr<PlayerStubImpl> playerService = std::make_shared<PlayerStubImpl>(&player);
+
     CommonAPI::Runtime::LoadState loadState;
-    auto runtime = CommonAPI::Runtime::load(loadState);
+    static auto runtime = CommonAPI::Runtime::load(loadState);
     if (loadState != CommonAPI::Runtime::LoadState::SUCCESS) {
         std::cerr << "Error: Unable to load runtime!\n";
         return -1;
     }
 
     lms.connect([&](MmError *e) {
-        registerService<IndexerStubImpl, LMSProvider> (runtime,
-                                          &lms,
-                                          "local:org.genivi.mediamanager.Indexer:"
-                                          "org.genivi.mediamanager.Indexer",
-                                          "Indexer",
-                                          e);
+      runtime->getServicePublisher()->registerService(indexerService, 
+        "local:org.genivi.mediamanager.Indexer:org.genivi.mediamanager.Indexer", runtime->createFactory());
     });
 
     browser.connect([&](MmError *e) {
-        registerService<BrowserStubImpl, BrowserProvider> (runtime,
-                                          &browser,
-                                          "local:org.genivi.mediamanager.Browser:"
-                                          "org.genivi.mediamanager.Browser",
-                                          "Browser",
-                                          e);
+      runtime->getServicePublisher()->registerService(browserService, 
+        "local:org.genivi.mediamanager.Browser:org.genivi.mediamanager.Browser", runtime->createFactory());
     });
 
     player.connect([&](MmError *e) {
-        registerService<PlayerStubImpl, PlayerProvider> (runtime,
-                                          &player,
-                                          "local:org.genivi.mediamanager.Player:"
-                                          "org.genivi.mediamanager.Player",
-                                          "Player",
-                                          e);
+      runtime->getServicePublisher()->registerService(playerService, 
+        "local:org.genivi.mediamanager.Player:org.genivi.mediamanager.Player", runtime->createFactory());
     });
 
     loop = g_main_loop_new (NULL, FALSE);
     g_main_loop_run (loop);
-
 }
