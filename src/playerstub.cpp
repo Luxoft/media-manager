@@ -21,25 +21,7 @@ PlayerStubImpl::PlayerStubImpl (PlayerProvider *player) {
 
     initializeDefaultValues();
 
-    m_generalFilter.push_back("Path");
-    m_generalFilter.push_back("Parent");
-    m_generalFilter.push_back("Type");
-    m_generalFilter.push_back("TypeEx");
-    m_generalFilter.push_back("DisplayName");
-    m_generalFilter.push_back("ChildCount");
-    m_generalFilter.push_back("Artists");
-    m_generalFilter.push_back("Artist");
-    m_generalFilter.push_back("Searchable");
-    m_generalFilter.push_back("MIMEType");
-    m_generalFilter.push_back("Album");
-    m_generalFilter.push_back("URI");
-    m_generalFilter.push_back("Genre");
-    m_generalFilter.push_back("Size");
-    m_generalFilter.push_back("TrackNumber");
-    m_generalFilter.push_back("Bitrate");
-    m_generalFilter.push_back("SampleRate");
-    m_generalFilter.push_back("Duration");
-    m_generalFilter.push_back("AlbumArtURL");
+    m_generalFilter.push_back("*");
 }
 
 void PlayerStubImpl::initializeDefaultValues() {

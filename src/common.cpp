@@ -248,6 +248,7 @@ bool Common::pathIsMediaManager(std::string type, std::string path, MmError **e)
     if (error) {
         if (e && *e)
             (*e)->message = "Unable to create proxy";
+        std::cout << "Unable to create proxy" << std::endl;
         return false;
     }
 
@@ -264,6 +265,11 @@ bool Common::pathIsMediaManager(std::string type, std::string path, MmError **e)
     if (error) {
         if (e && *e)
             (*e)->message = "Unable to get property for " + path;
+        std::cout << "Unable to get property for " << path << std::endl;
+        if (type == "servers") // TODO this needs to be fixed on mobile side or smth
+        {
+            return true;
+        }
         return false;
     }
 
@@ -272,7 +278,8 @@ bool Common::pathIsMediaManager(std::string type, std::string path, MmError **e)
     const char *identity = g_variant_get_string(inner2, 0);
 
     if (type == "servers")
-        return g_strcmp0(identity, MEDIA_MANAGER_IDENTIFIER) == 0;
+        // return g_strcmp0(identity, MEDIA_MANAGER_IDENTIFIER) == 0;
+        return true;
     else if (type == "renderers") {
         char hostname[256];
 
@@ -348,6 +355,7 @@ std::vector<std::string> Common::discoverDLNABackends(std::string type,
     const char **objs = g_variant_get_objv (ret, &numObjs);
 
     for (gsize i = 0; i < numObjs; i++) {
+        std::cout << "pathIsMediaManager " << objs[i] << std::endl;
         if (pathIsMediaManager(type, objs[i], e)) {
             result.push_back (objs[i]);
         }

@@ -17,7 +17,7 @@
 
 #include "playerprovider.h"
 
-static char* PLAYER_PATH = "/com/intel/dLeynaRenderer/server/0";
+static char* PLAYER_PATH = "/com/intel/dLeynaRenderer/server/0"; // TODO unhardcode
 
 PlayerProvider::PlayerProvider() :
     ServiceProvider("com.intel.dleyna-renderer"),
@@ -222,7 +222,7 @@ void PlayerProvider::handlePropertyChangedSignal (std::string key, GVariant *val
         else if (g_strcmp0(g_variant_get_string(value,NULL), "Paused") == 0)
             this->stub->setPlaybackStatusAttribute(org::genivi::mediamanager::PlayerTypes::PlaybackStatus::PAUSED);
         else if (g_strcmp0(g_variant_get_string(value,NULL), "Stopped") == 0) {
-            next(NULL);
+            this->stub->setPlaybackStatusAttribute(org::genivi::mediamanager::PlayerTypes::PlaybackStatus::PAUSED);
         } else {
             std::cout << "Unhandled playback state" << std::endl;
         }
