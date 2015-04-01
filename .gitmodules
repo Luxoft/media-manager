@@ -1,3 +1,3 @@
 [submodule "interfaces"]
 	path = interfaces
-	url = http://git.projects.genivi.org/media-manager-interfaces.git
+	url = git@github.com:Luxoft/media-manager-interfaces.git
