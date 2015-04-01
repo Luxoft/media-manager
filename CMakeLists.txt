@@ -13,10 +13,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 PROJECT (MEDIAMANAGER)
 
 ADD_SUBDIRECTORY (src)
-#ADD_SUBDIRECTORY (tests)
-
-INSTALL (FILES 10-media-manager-usb-mount-rules.rules
-         DESTINATION /etc/udev/rules.d/)
+ADD_SUBDIRECTORY (interfaces)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in
                "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"

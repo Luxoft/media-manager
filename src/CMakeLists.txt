@@ -14,9 +14,9 @@ cmake_minimum_required(VERSION 2.6)
 INCLUDE (../common.cmake)
 
 SET (SOURCES
-    lms.cpp
+#   lms.cpp
     main.cpp
-    indexerstub.cpp
+#   indexerstub.cpp
     serviceprovider.cpp
     browserprovider.cpp
     playerprovider.cpp
@@ -56,3 +56,5 @@ INSTALL(TARGETS media-manager
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+
+install (TARGETS media-manager DESTINATION bin COMPONENT headunit)

@@ -18,21 +18,17 @@
 #include <gio/gio.h>
 #include <CommonAPI/CommonAPI.h>
 
-#include "lms.h"
 #include "browserprovider.h"
 #include "playerprovider.h"
-#include "indexerstub.h"
 #include "browserstub.h"
 #include "playerstub.h"
 
 int main (int argc, char *argv[]) {
     guint watcher_id;
     GMainLoop *loop;
-    LMSProvider lms;
     BrowserProvider browser;
     PlayerProvider player;
 
-    static std::shared_ptr<IndexerStubImpl> indexerService = std::make_shared<IndexerStubImpl>(&lms);
     static std::shared_ptr<BrowserStubImpl> browserService = std::make_shared<BrowserStubImpl>(&browser);
     static std::shared_ptr<PlayerStubImpl> playerService = std::make_shared<PlayerStubImpl>(&player);
 
@@ -42,11 +38,6 @@ int main (int argc, char *argv[]) {
         std::cerr << "Error: Unable to load runtime!\n";
         return -1;
     }
-
-    lms.connect([&](MmError *e) {
-      runtime->getServicePublisher()->registerService(indexerService, 
-        "local:org.genivi.mediamanager.Indexer:org.genivi.mediamanager.Indexer", runtime->createFactory());
-    });
 
     browser.connect([&](MmError *e) {
       runtime->getServicePublisher()->registerService(browserService, 

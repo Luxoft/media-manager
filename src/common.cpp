@@ -365,5 +365,5 @@ std::vector<std::string> Common::discoverDLNABackends(std::string type,
         if (e && *e)
             (*e)->message = "Unable to get servers from dLeyna";
     }
-
+    return result;
 }
