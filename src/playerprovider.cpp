@@ -222,7 +222,7 @@ void PlayerProvider::handlePropertyChangedSignal (std::string key, GVariant *val
         else if (g_strcmp0(g_variant_get_string(value,NULL), "Paused") == 0)
             this->stub->setPlaybackStatusAttribute(org::genivi::mediamanager::PlayerTypes::PlaybackStatus::PAUSED);
         else if (g_strcmp0(g_variant_get_string(value,NULL), "Stopped") == 0) {
-            this->stub->setPlaybackStatusAttribute(org::genivi::mediamanager::PlayerTypes::PlaybackStatus::PAUSED);
+            this->stub->setPlaybackStatusAttribute(org::genivi::mediamanager::PlayerTypes::PlaybackStatus::STOPPED);
         } else {
             std::cout << "Unhandled playback state" << std::endl;
         }
