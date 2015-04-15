@@ -16,6 +16,60 @@
 
 namespace MM = org::genivi::mediamanager;
 
+namespace
+{
+
+std::string parseStringFromGVariant(GVariant * parameters)
+{
+    std::string ret;
+    if (!parameters)
+    {
+        return ret;
+    }
+    if (g_variant_n_children(parameters) != 1)
+    {
+        return ret;
+    }
+
+    GVariant *tmp = g_variant_get_child_value(parameters, 0);
+    gsize len = 0;
+    const gchar * str = g_variant_get_string(tmp, &len);
+    ret = std::string(str, len);
+    g_variant_unref(tmp);
+    return ret;
+}
+
+void handleFoundServerCB (GDBusConnection *connection,
+                                                const gchar *sender_name,
+                                                const gchar *object_path,
+                                                const gchar *interface_name,
+                                                const gchar *signal_name,
+                                                GVariant *parameters,
+                                                gpointer user_data) {
+    std::string server = parseStringFromGVariant(parameters);
+    if (!server.empty())
+    {
+        BrowserStubImpl * self = ((BrowserStubImpl *) user_data);
+        self->fireFoundServerEvent(server);
+    }
+}
+
+void handleLostServerCB (GDBusConnection *connection,
+                                                const gchar *sender_name,
+                                                const gchar *object_path,
+                                                const gchar *interface_name,
+                                                const gchar *signal_name,
+                                                GVariant *parameters,
+                                                gpointer user_data) {
+    std::string server = parseStringFromGVariant(parameters);
+    if (!server.empty())
+    {
+        BrowserStubImpl * self = ((BrowserStubImpl *) user_data);
+        self->fireLostServerEvent(server);
+    }
+}
+}
+
 BrowserStubImpl::BrowserStubImpl (BrowserProvider *browser) {
     m_browser = browser;
 
@@ -38,6 +92,7 @@ BrowserStubImpl::BrowserStubImpl (BrowserProvider *browser) {
     m_generalFilter.push_back("SampleRate");
     m_generalFilter.push_back("Duration");
     m_generalFilter.push_back("AlbumArtURL");
+    subscribeToFoundLostServerEvents();
 }
 
 std::string sortKeyToString (MM::BrowserTypes::SortKey sk) {
@@ -234,4 +289,41 @@ void BrowserStubImpl::searchObjectsEx(std::string path,
                                 NULL);
 
     Common::resultMapListToCAPIResultMapList(bml, items, m_generalFilter);
+}
+
+void BrowserStubImpl::subscribeToFoundLostServerEvents()
+{
+    GError *error = NULL;
+
+    GDBusConnection *connection = g_bus_get_sync (
+        G_BUS_TYPE_SESSION,
+        NULL,
+        &error);
+
+    if (error) {
+        std::cout << "Failed to set up connection for signal listener:" << error->message <<std::endl;
+        return;
+    }
+
+    g_dbus_connection_signal_subscribe (connection,
+                                    "com.intel.dleyna-server",
+                                    "com.intel.dLeynaServer.Manager",
+                                    "FoundServer",
+                                    NULL,
+                                    NULL,
+                                    G_DBUS_SIGNAL_FLAGS_NONE,
+                                    handleFoundServerCB,
+                                    this,
+                                    NULL);
+
+    g_dbus_connection_signal_subscribe (connection,
+                                    "com.intel.dleyna-server",
+                                    "com.intel.dLeynaServer.Manager",
+                                    "LostServer",
+                                    NULL,
+                                    NULL,
+                                    G_DBUS_SIGNAL_FLAGS_NONE,
+                                    handleLostServerCB,
+                                    this,
+                                    NULL);
 }

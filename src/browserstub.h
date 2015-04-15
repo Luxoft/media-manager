@@ -112,14 +112,11 @@ public:
                          MM::BrowserTypes::SortKey sortKey,
                          MM::MediaTypes::ResultMapList& objects,
                          MM::BrowserTypes::BrowserError& e);
-
+private:
+    void subscribeToFoundLostServerEvents();
 private:
     BrowserProvider *m_browser;
     std::vector<std::string> m_generalFilter;
-
-    void browserMapToCAPIBrowserMap(Common::ResultMapList* from,
-                               MM::MediaTypes::ResultMapList& to,
-                               std::vector<std::string> filter);
 };
 
 #endif /* BROWSERSTUB_H */
